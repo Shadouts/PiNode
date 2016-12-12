@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>PiNode EXTREME! - Transaction</title>
+
+<meta charset="UTF-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="shortcut icon" href="/image/favicon.png">
+
+<!-- Latest compiled and minified Bootstrap CSS -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<!-- jQuery library -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<header id="navbar">
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">
+				<span><img src="/image/pilogo-small.png"></span>
+				PiNode EXTREME!
+			</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Check a Transaction! <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li data-toggle="collapse" data-target=".in">
+							<div class="container">
+								<form class="form" action="/transaction/" method="GET" target="_top">
+									<div class="input-group">
+										<input type="text" name="check-txid" class="form-control" placeholder="txid" />	
+										<span class="input-group-btn">
+											<button type="submit" class="btn btn-primary">Go!</button>
+										</span>
+									</div>
+								</form>
+							</div>
+						</li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Check a Block! <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li data-toggle="collapse" data-target=".in">
+							<div class="container">
+								<form class="form" action="/block/" method="GET" target="_top">
+									<div class="input-group">
+										<input type="text" name="check-block" class="form-control" placeholder="Block hash" />	
+										<span class="input-group-btn">
+											<button type="submit" class="btn btn-primary">Go!</button>
+										</span>
+									</div>
+								</form>
+							</div>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#donate-modal" data-toggle="modal">Support This Node! <span class="caret"></span></a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+<!-- <script src="/js/navbar.js"></script> -->
+</header>
+
+<div id="donate-modal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content" id="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span></button>
+				<h3 class="modal-title">Donate!</h3>
+			</div>
+			<div class="modal-body text-center">
+				<img src="/image/donations.png" alt="Bitcoin Address: 14o6Z9U32f2dXv6x5PCvHQaWY1jkQepDZQ" height="350" width="350"><br><br>
+				<p>Bitcoin Address: 14o6Z9U32f2dXv6x5PCvHQaWY1jkQepDZQ</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default center-block" data-toggle="modal" data-target="#donate-modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="main">
+	<div class="container">
+		<h1 class="text-center">Transaction!</h1>
+		<div class="col-md-6">
+			<div class="panel panel-default">
+				<div class="panel-heading text-center">
+					<h1 class="panel-title">Transaction Info</h1>
+				</div>
+				<div id="gettx-table" class="panel-body table-responsive">
+					<table class="table table-striped">
+						<tbody>
+							<tr>
+								<td>Transaction Id:</td>
+								<td class="text-right"><a id="gettx-txid"></a></td>
+							</tr>
+							<tr>
+								<td>Transaction hash:</td>
+								<td class="text-right" id="gettx-hash"></td>
+							</tr>
+							<tr>
+								<td>Size:</td>
+								<td class="text-right" id="gettx-size"></td>
+							</tr>
+							<tr>
+								<td>Virtual size:</td>
+								<td class="text-right" id="gettx-vsize"></td>
+							</tr>
+							<tr>
+								<td>Version:</td>
+								<td class="text-right" id="gettx-version"></td>
+							</tr>
+							<tr>
+								<td>Lock time:</td>
+								<td class="text-right" id="gettx-locktime"></td>
+							</tr>
+							<tr>
+								<td>Block hash:</td>
+								<td class="text-right"><a id="gettx-blockhash"></a></td>
+							</tr>
+							<tr>
+								<td>Confirmations:</td>
+								<td class="text-right" id="gettx-confirmations"></td>
+							</tr>
+							<tr>
+								<td>Time:</td>
+								<td class="text-right" id="gettx-time"></td>
+							</tr>
+							<tr>
+								<td>Block time:</td>
+								<td class="text-right" id="gettx-blocktime"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+		<div class="col-md-6">
+			<div class="panel panel-default">
+				<div class="panel-heading text-center">
+					<h1 class="panel-title">Outputs</h1>
+				</div>
+				<div class="panel-body table-responsive">
+					<table class="table table-striped">
+						<thead><th>Vout</th><th>Amount</th><th>Address</th></thead>
+						<tbody id="gettx-out" ></tbody>
+		</div>
+	</div>
+</div>
+
+</body>
+
+<!-- Latest compiled JavaScript -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+</html>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+	function getURLVar(variable) {
+		var query = window.location.search.substring(1);
+		var vars = query.split("&");
+		for (var i=0; i < vars.length; i++) {
+			var pair = vars[i].split("=");
+			if(pair[0] == variable){
+				return pair[1];
+			}
+		}
+		return(false);
+	}
+	
+	var hash = getURLVar('check-txid');
+	
+	$.getJSON('/php/rpcRequest.php', {"req":"getrawtransaction", "par1":hash}, function (data) {
+		$('#gettx-txid').html(data.result.txid.toString());
+		$('#gettx-hash').html(data.result.hash.toString());
+		$('#gettx-size').html(data.result.size.toString());
+		$('#gettx-vsize').html(data.result.vsize.toString());
+		$('#gettx-version').html(data.result.version.toString());
+		$('#gettx-locktime').html(data.result.locktime.toString());
+		
+		if (data.result.blockhash) {
+			$('#gettx-blockhash').html(data.result.blockhash.toString());
+			$('#gettx-confirmations').html(data.result.confirmations.toString());
+			$('#gettx-time').html(data.result.time.toString());
+			$('#gettx-blocktime').html(data.result.blocktime.toString());
+			
+			$('#gettx-blockhash').prop("href", "/block/?check-block="+data.result.blockhash);
+		} else {
+			$('#gettx-blockhash').parent().html('Unconfirmed transaction!');
+			$('#gettx-confirmations').html('Unconfirmed transaction!');
+			$('#gettx-time').html('Unconfirmed transaction!');
+			$('#gettx-blocktime').html('Unconfirmed transaction!');
+		}		
+		
+		$('#gettx-txid').prop("href", "/transaction/?check-txid="+data.result.txid);
+		
+		for (var i = 0, len1 = data.result.vout.length; i < len1; i++) {
+			var value = data.result.vout[i].value.toString();
+			var n = data.result.vout[i].n.toString();
+			var addresses = '';
+			
+			for (var j = 0, len2 = data.result.vout[i].scriptPubKey.addresses.length; j < len2; j++) {
+				 addresses = addresses+data.result.vout[i].scriptPubKey.addresses[j].toString()+'<br>';
+			}
+			
+			$('#gettx-out').append('<tr><td>'+n+'</td><td>'+value+'</td><td>'+addresses+'</td></tr>');
+		}
+	});
+
+	delete hash;
+});
+</script>

@@ -1,0 +1,22 @@
+.navbar-brand {
+	padding: 0px;
+}
+
+.navbar-brand>span>img {
+	padding: 5px;
+	padding-left: 75px;
+	width: auto;
+	height: 100%;
+}
+
+.navbar-right {
+	padding-right: 45px;
+}
+
+.container {
+	width: 95%;
+}
+
+.dropdown-menu {
+	width: 650px;
+}
