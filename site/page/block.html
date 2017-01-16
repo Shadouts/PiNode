@@ -5,9 +5,11 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="robots" content="nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="shortcut icon" href="/image/favicon.png">
+<link rel="canonical" href="/block" /> <!-- In case of robots behaving badly. -->
 
 <!-- Latest compiled and minified Bootstrap CSS -->
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -46,9 +48,9 @@
 					<ul class="dropdown-menu">
 						<li data-toggle="collapse" data-target=".in">
 							<div class="container">
-								<form class="form" action="/transaction/" method="GET" target="_top">
+								<form class="form" action="/transaction" method="GET" target="_top">
 									<div class="input-group">
-										<input type="text" name="check-txid" class="form-control" placeholder="txid" />	
+										<input type="text" name="txid" class="form-control" placeholder="txid" />	
 										<span class="input-group-btn">
 											<button type="submit" class="btn btn-primary">Go!</button>
 										</span>
@@ -63,9 +65,9 @@
 					<ul class="dropdown-menu">
 						<li data-toggle="collapse" data-target=".in">
 							<div class="container">
-								<form class="form" action="/block/" method="GET" target="_top">
+								<form class="form" action="/block" method="GET" target="_top">
 									<div class="input-group">
-										<input type="text" name="check-block" class="form-control" placeholder="Block hash" />	
+										<input type="text" name="block-hash" class="form-control" placeholder="Block hash" />	
 										<span class="input-group-btn">
 											<button type="submit" class="btn btn-primary">Go!</button>
 										</span>
@@ -116,7 +118,7 @@
 						<tbody>
 							<tr>
 								<td>Block hash:</td>
-								<td class="text-right"><a id="getblock-hash"></a></td>
+								<td class="text-right"><a id="getblock-hash" class="block-hash"></a></td>
 							</tr>
 							<tr>
 								<td>Confirmations:</td>
@@ -176,11 +178,11 @@
 							</tr>
 							<tr>
 								<td>Previous block hash:</td>
-								<td class="text-right"><a id="getblock-previousblockhash"></a></td>
+								<td class="text-right"><a id="getblock-previousblockhash" class="block-hash"></a></td>
 							</tr>
 							<tr>
 								<td>Next block hash:</td>
-								<td class="text-right"><a id="getblock-nextblockhash" id="getblock-nextblockhash"></a></td>
+								<td class="text-right"><a id="getblock-nextblockhash" class="block-hash"></a></td>
 							</tr>
 						</tbody>
 					</table>
@@ -195,6 +197,9 @@
 				<div class="panel-body table-responsive">
 					<table class="table table-striped">
 						<tbody id="getblock-tx" ></tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -211,6 +216,7 @@
 <script type="text/javascript">
 $(document).ready(function () {
 
+	// Allow page JS to pull URL GET variables and use them.
 	function getURLVar(variable) {
 		var query = window.location.search.substring(1);
 		var vars = query.split("&");
@@ -223,45 +229,60 @@ $(document).ready(function () {
 		return(false);
 	}
 	
-	var hash = getURLVar('check-block');
+	// Check JSON items to see if they are defined before attempting to insert them into HTML elements.
+	function dataFill(field, value = null) {
+		if (value != null) {
+			var string = value.toString();
+		
+			field.html(string);
+			
+			// Determine type of data before creating href property.
+			if (field.hasClass('block-hash')) {
+				field.prop('href', '/block?block-hash='+string);
+			}
+			else if (field.hasClass('txid')) {
+				field.prop('href', '/transaction?txid='+string);
+			}
+			
+			delete string;
+		}
+	}
+	
+	// Grab GET variable "block-hash" before making RPC query.
+	var blockHash = getURLVar('block-hash');
 
-	$.getJSON('/php/rpcRequest.php', {"req": "getblock", "par1":hash}, function (data) {
+	// Query RPC and insert data to HTML elements.
+	$.getJSON('/php/rpcRequest.php', {"req": "getblock", "par1":blockHash}, function (data) {
 		if (data.error == null) {	
-			$('#getblock-hash').html(data.result.hash.toString());
-			$('#getblock-confirmations').html(data.result.confirmations.toString());
-			$('#getblock-size').html(data.result.size.toString());
-			$('#getblock-strippedsize').html(data.result.strippedsize.toString());
-			$('#getblock-weight').html(data.result.weight.toString());
-			$('#getblock-height').html(data.result.height.toString());
-			$('#getblock-version').html(data.result.version.toString());
-			$('#getblock-versionhex').html(data.result.versionHex.toString());
-			$('#getblock-merkleroot').html(data.result.merkleroot.toString());
-			$('#getblock-time').html(data.result.time.toString());
-			$('#getblock-mediantime').html(data.result.mediantime.toString());
-			$('#getblock-nonce').html(data.result.nonce.toString());
-			$('#getblock-bits').html(data.result.bits.toString());
-			$('#getblock-difficulty').html(data.result.difficulty.toString());
-			$('#getblock-chainwork').html(data.result.chainwork.toString());
-			$('#getblock-previousblockhash').html(data.result.previousblockhash.toString());
+			dataFill($('#getblock-hash'), data.result.hash);
+			dataFill($('#getblock-confirmations'), data.result.confirmations);
+			dataFill($('#getblock-size'), data.result.size);
+			dataFill($('#getblock-strippedsize'), data.result.strippedsize);
+			dataFill($('#getblock-weight'), data.result.weight);
+			dataFill($('#getblock-height'), data.result.height);
+			dataFill($('#getblock-version'), data.result.version);
+			dataFill($('#getblock-versionhex'), data.result.versionHex);
+			dataFill($('#getblock-merkleroot'), data.result.merkleroot);
+			dataFill($('#getblock-time'), data.result.time);
+			dataFill($('#getblock-mediantime'), data.result.mediantime);
+			dataFill($('#getblock-nonce'), data.result.nonce);
+			dataFill($('#getblock-bits'), data.result.bits);
+			dataFill($('#getblock-difficulty'), data.result.difficulty);
+			dataFill($('#getblock-chainwork'), data.result.chainwork);
+			dataFill($('#getblock-previousblockhash'), data.result.previousblockhash);
+			dataFill($('#getblock-nextblockhash'), data.result.nextblockhash);
 			
-			$('#getblock-hash').prop('href', '/block/?check-block='+data.result.hash.toString());
-			$('#getblock-previousblockhash').prop('href', '/block/?check-block='+data.result.previousblockhash.toString());
-			
-			if (data.result.nextblockhash) {
-				$('#getblock-nextblockhash').html(data.result.nextblockhash.toString());
-				$('#getblock-nextblockhash').prop('href', '/block/?check-block='+data.result.nextblockhash.toString());
-			}
-			
+			// Loop through data.result.tx[].
 			for (var i = 0, len = data.result.tx.length; i < len; i++) {
-				var txid = data.result.tx[i].toString();
-				$('#getblock-tx').append('<tr><td><a href="/transaction/?check-txid='+txid+'">'+txid+'</tr></tr>');
-				delete txid;
+				$('#getblock-tx').append('<tr><td><a class="txid">');
+				
+				dataFill($('#getblock-tx').children().last().find('.txid'), data.result.tx[i]);
 			}
-		} else {
-			$('#nodeinfo-table').html(data.error);
+		} else { // Put error message in Block Info panel.
+			$('#getblockinfo-table').html(data.error);
 		}
 	});
 	
-	delete hash;
+	delete blockHash;
 });
 </script>

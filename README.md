@@ -9,6 +9,7 @@ Bitcoin block explorer implementation for an indexed Raspberry Pi full node.
 ##Installation
 * Copy site files to site root directory.
 * Change the JSON-RPC connection variables in rpcRequest.php.
+* The application utilizes clean URLs. As such, this requires ModRewite to be enabled. Rewrite rules have been provided as an .htaccess file, however, it is more efficient to add these rules to the server configuration. Add the .htaccess file to each directory or add the rules to the VirtualHost configuration.
 * sudo service apache2 restart
  
 ##Feedback

@@ -5,6 +5,7 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="robots" content="nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="shortcut icon" href="/image/favicon.png">
@@ -46,9 +47,9 @@
 					<ul class="dropdown-menu">
 						<li data-toggle="collapse" data-target=".in">
 							<div class="container">
-								<form class="form" action="/transaction/" method="GET" target="_top">
+								<form class="form" action="/transaction" method="GET" target="_top">
 									<div class="input-group">
-										<input type="text" name="check-txid" class="form-control" placeholder="txid" />	
+										<input type="text" name="txid" class="form-control" placeholder="txid" />	
 										<span class="input-group-btn">
 											<button type="submit" class="btn btn-primary">Go!</button>
 										</span>
@@ -63,9 +64,9 @@
 					<ul class="dropdown-menu">
 						<li data-toggle="collapse" data-target=".in">
 							<div class="container">
-								<form class="form" action="/block/" method="GET" target="_top">
+								<form class="form" action="/block" method="GET" target="_top">
 									<div class="input-group">
-										<input type="text" name="check-block" class="form-control" placeholder="Block hash" />	
+										<input type="text" name="block-hash" class="form-control" placeholder="Block hash" />	
 										<span class="input-group-btn">
 											<button type="submit" class="btn btn-primary">Go!</button>
 										</span>
@@ -109,22 +110,38 @@
 		<div class="col-md-3">
 			<div class="panel panel-default">
 				<div class="panel-heading text-center">
-					<h1 class="panel-title">Node Info</h1>
+					<h1 class="panel-title">Network Info</h1>
 				</div>
-				<div id="nodeinfo-table" class="panel-body table-responsive">
+				<div id="networkinfo-table" class="panel-body table-responsive">
 					<table class="table table-striped">
 						<tbody>
 							<tr>
 								<td>Version:</td>
-								<td class="text-right" id="getinfo-version"></td>
+								<td class="text-right" id="getnetworkinfo-version"></td>
+							</tr>
+							<tr>
+								<td>Sub version:</td>
+								<td class="text-right" id="getnetworkinfo-subversion"></td>
+							</tr>
+							<tr>
+								<td>Protocol version:</td>
+								<td class="text-right" id="getnetworkinfo-protocolversion"></td>
 							</tr>
 							<tr>
 								<td>Time offset:</td>
-								<td class="text-right" id="getinfo-timeoffset"></td>
+								<td class="text-right" id="getnetworkinfo-timeoffset"></td>
 							</tr>
 							<tr>
 								<td>Connections:</td>
-								<td class="text-right" id="getinfo-connections"></td>
+								<td class="text-right"><a href="/peers" id="getnetworkinfo-connections"></a></td>
+							</tr>
+							<tr>
+								<td>Relay fee:</td>
+								<td class="text-right" id="getnetworkinfo-relayfee"></td>
+							</tr>
+							<tr>
+								<td>Local services:</td>
+								<td class="text-right" id="getnetworkinfo-localservices"></td>
 							</tr>
 						</tbody>
 					</table>
@@ -134,7 +151,7 @@
 		<div class="col-md-6">
 			<div class="panel panel-default">
 				<div class="panel-heading text-center">
-					<h1 class="panel-title">Blockchain Info</h1>
+					<h1 class="panel-title">Block Chain Info</h1>
 				</div>
 				<div id="blockchaininfo-table" class="panel-body table-responsive">
 					<table class="table table-striped">
@@ -145,7 +162,7 @@
 							</tr>
 							<tr>
 								<td>Best block hash:</td>
-								<td class="text-right"><a id="getblockchaininfo-bestblockhash"></a></td>
+								<td class="text-right"><a id="getblockchaininfo-bestblockhash" class="block-hash"></a></td>
 							</tr>
 							<tr>
 								<td>Difficulty:</td>
@@ -167,7 +184,7 @@
 		<div class="col-md-3">
 			<div class="panel panel-default">
 				<div class="panel-heading text-center">
-					<h1 class="panel-title">Mempool Info</h1>
+					<h1 class="panel-title">MemPool Info</h1>
 				</div>
 				<div id="mempoolinfo-table" class="panel-body table-responsive">
 					<table class="table table-striped">
@@ -200,62 +217,75 @@
 <script type="text/javascript">
 $(document).ready(function () {
 
-function deltaCheck(field, to) {
-	if (field.html() != to) {
-		field.css({fontSize: "1.3em"});
-		field.html(to);
-		field.animate({fontSize: "1em"}, 600, "swing");
+	// Check JSON items to see if they are different from before. If there is a change, value is loaded and animated.
+	function deltaCheck(field, value) {
+		var string = value.toString();
+		
+		if (field.html() != string) {
+			field.css({fontSize: "1.3em"});
+			field.html(string);
+			field.animate({fontSize: "1em"}, 600, "swing");
+		}
+		
+		// Determine type of data before creating href property.
+		if (field.hasClass('block-hash')) {
+			field.prop('href', '/block?block-hash='+string);
+		}
+		
+		delete string;
 	}
-}
-
-function rpcGetInfo() {
-	$.getJSON('/php/rpcRequest.php', {"req" : "getinfo"}, function (data) {
-		if (data.error == null) {
-			deltaCheck($('#getinfo-version'), data.result.version.toString());
-			deltaCheck($('#getinfo-timeoffset'), data.result.timeoffset.toString());
-			deltaCheck($('#getinfo-connections'), data.result.connections.toString());
-		} else {
-			$('#nodeinfo-table').html(data.error);
-		}
-	});
-}
-
-function rpcGetBlockchainInfo() {
-	$.getJSON('/php/rpcRequest.php', {"req" : "getblockchaininfo"}, function (data) {
-		if (data.error == null) {
-			deltaCheck($('#getblockchaininfo-blocks'), data.result.blocks.toString());
-			deltaCheck($('#getblockchaininfo-bestblockhash'), data.result.bestblockhash.toString());
-			deltaCheck($('#getblockchaininfo-difficulty'), data.result.difficulty.toString());
-			deltaCheck($('#getblockchaininfo-mediantime'), data.result.mediantime.toString());
-			deltaCheck($('#getblockchaininfo-chainwork'), data.result.chainwork.toString());
-			
-			$('#getblockchaininfo-bestblockhash').prop('href', '/block/?check-block='+data.result.bestblockhash.toString());
-		} else {
-			$('#blockchaininfo-table').html(data.error);
-		}
-	});
-}
-
-function rpcGetMempoolInfo() {
-	$.getJSON('/php/rpcRequest.php', {"req" : "getmempoolinfo"}, function (data) {
-		if (data.error == null) {
-			deltaCheck($('#getmempoolinfo-size'), data.result.size.toString());
-			deltaCheck($('#getmempoolinfo-bytes'), data.result.bytes.toString());
-		} else {
-			$('#mempoolinfo-table').html(data.error);
-		}
-	});
-}
-
-function rpcCalls() {
-	rpcGetInfo();
-	rpcGetBlockchainInfo();
-	rpcGetMempoolInfo();
-}
-
-rpcCalls();
-
-var dataRefresh = setInterval(rpcCalls, 7000);
+	
+	function rpcGetNetworkInfo() {
+		$.getJSON('/php/rpcRequest.php', {"req" : "getnetworkinfo"}, function (data) {
+			if (data.error == null) {
+				deltaCheck($('#getnetworkinfo-version'), data.result.version);
+				deltaCheck($('#getnetworkinfo-subversion'), data.result.subversion);
+				deltaCheck($('#getnetworkinfo-protocolversion'), data.result.protocolversion);
+				deltaCheck($('#getnetworkinfo-timeoffset'), data.result.timeoffset);
+				deltaCheck($('#getnetworkinfo-connections'), data.result.connections);
+				deltaCheck($('#getnetworkinfo-relayfee'), data.result.relayfee);
+				deltaCheck($('#getnetworkinfo-localservices'), data.result.localservices);
+				
+			} else {
+				$('#networkinfo-table').html(data.error);
+			}
+		});
+	}
+	
+	function rpcGetBlockChainInfo() {
+		$.getJSON('/php/rpcRequest.php', {"req" : "getblockchaininfo"}, function (data) {
+			if (data.error == null) {
+				deltaCheck($('#getblockchaininfo-blocks'), data.result.blocks);
+				deltaCheck($('#getblockchaininfo-bestblockhash'), data.result.bestblockhash);
+				deltaCheck($('#getblockchaininfo-difficulty'), data.result.difficulty);
+				deltaCheck($('#getblockchaininfo-mediantime'), data.result.mediantime);
+				deltaCheck($('#getblockchaininfo-chainwork'), data.result.chainwork);
+			} else {
+				$('#blockchaininfo-table').html(data.error);
+			}
+		});
+	}
+	
+	function rpcGetMempoolInfo() {
+		$.getJSON('/php/rpcRequest.php', {"req" : "getmempoolinfo"}, function (data) {
+			if (data.error == null) {
+				deltaCheck($('#getmempoolinfo-size'), data.result.size);
+				deltaCheck($('#getmempoolinfo-bytes'), data.result.bytes);
+			} else {
+				$('#mempoolinfo-table').html(data.error);
+			}
+		});
+	}
+	
+	function rpcCalls() {
+		rpcGetNetworkInfo();
+		rpcGetBlockChainInfo();
+		rpcGetMempoolInfo();
+	}
+	
+	rpcCalls();
+	
+	var dataRefresh = setInterval(rpcCalls, 7000);
 
 });
 </script>

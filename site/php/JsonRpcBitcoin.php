@@ -143,7 +143,7 @@ class JsonRpcBitcoin {
 	}
 	
 	public function getnetworkinfo() {
-		return $this->send('getnetnetworkinfo');
+		return $this->send('getnetworkinfo');
 	}
 	
 	public function getpeerinfo() {

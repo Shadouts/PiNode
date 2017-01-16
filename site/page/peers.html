@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>PiNode EXTREME! - Peers</title>
+
+<meta charset="UTF-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="robots" content="nofollow" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="shortcut icon" href="/image/favicon.png">
+<link rel="canonical" href="/peers" /> <!-- In case of robots behaving badly. -->
+
+<!-- Latest compiled and minified Bootstrap CSS -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<!-- jQuery library -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<header id="navbar">
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">
+				<span><img src="/image/pilogo-small.png"></span>
+				PiNode EXTREME!
+			</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Check a Transaction! <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li data-toggle="collapse" data-target=".in">
+							<div class="container">
+								<form class="form" action="/transaction" method="GET" target="_top">
+									<div class="input-group">
+										<input type="text" name="txid" class="form-control" placeholder="txid" />	
+										<span class="input-group-btn">
+											<button type="submit" class="btn btn-primary">Go!</button>
+										</span>
+									</div>
+								</form>
+							</div>
+						</li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Check a Block! <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li data-toggle="collapse" data-target=".in">
+							<div class="container">
+								<form class="form" action="/block" method="GET" target="_top">
+									<div class="input-group">
+										<input type="text" name="block-hash" class="form-control" placeholder="Block hash" />	
+										<span class="input-group-btn">
+											<button type="submit" class="btn btn-primary">Go!</button>
+										</span>
+									</div>
+								</form>
+							</div>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#donate-modal" data-toggle="modal">Support This Node! <span class="caret"></span></a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+<!-- <script src="/js/navbar.js"></script> -->
+</header>
+
+<div id="donate-modal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content" id="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span></button>
+				<h3 class="modal-title">Donate!</h3>
+			</div>
+			<div class="modal-body text-center">
+				<img src="/image/donations.png" alt="Bitcoin Address: 14o6Z9U32f2dXv6x5PCvHQaWY1jkQepDZQ" height="350" width="350"><br><br>
+				<p>Bitcoin Address: 14o6Z9U32f2dXv6x5PCvHQaWY1jkQepDZQ</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default center-block" data-toggle="modal" data-target="#donate-modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="main">
+	<div class="container">
+		<h1 class="text-center">Peers!</h1>
+		<div class="col-xs-12">
+			<div class="panel panel-default">
+				<div class="panel-heading text-center">
+					<h1 class="panel-title">Peer Info</h1>
+				</div>
+				<div id="getpeerinfo-table" class="panel-body table-responsive">
+					<table class="table table-striped table-hover">
+						<thead><th>Peer ID</th><th>IP address</th><th>Services</th><th>Ping time</th><th>Version</th><th>Sub version</th><th>Block height</th></thead>
+						<tbody id="getpeerinfo-peer"></tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>
+
+</body>
+
+<!-- Latest compiled JavaScript -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+</html>
+
+<script type="text/javascript">
+$(document).ready(function () {
+	// Check JSON items to see if they are defined before attempting to insert them into HTML elements.
+	function dataFill(field, value = null) {
+		if (value != null) {
+			var string = value.toString();
+		
+			field.html(string);
+			
+			// Determine type of data before creating href property.
+			if (field.hasClass('block-hash')) {
+				field.prop('href', '/block?block-hash='+string);
+			}
+			else if (field.hasClass('txid')) {
+				field.prop('href', '/transaction?txid='+string);
+			}
+			
+			delete string;
+		}
+	}
+				
+	// Query RPC and insert data to HTML elements.
+	$.getJSON('/php/rpcRequest.php', {"req": "getpeerinfo"}, function (data) {		
+		if (data.error == null) {
+			// Loop through peer objects.
+			for (var i = 0, len = data.result.length; i < len; i++) {
+				var peer = data.result[i];
+				
+				$('#getpeerinfo-peer').append('<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>');
+				
+				dataFill($('#getpeerinfo-peer').children().last().find('td').eq(0), peer.id);
+				dataFill($('#getpeerinfo-peer').children().last().find('td').eq(1), peer.addr);
+				dataFill($('#getpeerinfo-peer').children().last().find('td').eq(2), peer.services);
+				dataFill($('#getpeerinfo-peer').children().last().find('td').eq(3), peer.pingtime);
+				dataFill($('#getpeerinfo-peer').children().last().find('td').eq(4), peer.version);
+				dataFill($('#getpeerinfo-peer').children().last().find('td').eq(5), peer.subver);
+				
+				if (peer.synced_blocks >= 0) { // synced_blocks == -1 when no inventory was received from the peer.
+					dataFill($('#getpeerinfo-peer').children().last().find('td').eq(6), peer.synced_blocks);	
+				}
+				
+				delete peer;
+			}
+		} else { // Put error message in Block Info panel.
+			$('#getblockinfo-table').html(data.error);
+		}
+	});
+});
+</script>
